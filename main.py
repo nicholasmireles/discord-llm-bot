@@ -56,12 +56,10 @@ class ChatBotClient(Client):
             inference = server_response.json()
             response = inference["result"]["response"]
             print(server_response.text)
-            await message.channel.send(response)
         else:
             print(server_response)
-            await message.channel.send(
-                "I'm sorry, I'm having a hard time thinking right now. :pensive:"
-            )
+            response = "I'm sorry, I'm having a hard time thinking right now. :pensive:"
+        self.current_conversation.append(await message.channel.send(response))
 
     async def on_ready(self):
         print(f"We have logged in as {self.user}")
@@ -75,6 +73,7 @@ class ChatBotClient(Client):
                     message.content = re.sub(r"<@.*>", "@NickBot", message.content)
                     self.listening_channel = message.channel
                     await self.query_model(message)
+                    self.current_conversation.append(message)
                 case Message(channel=self.listening_channel) if self.listening_channel is not None:
                     self.current_conversation.append(message)
                     if message.content.startswith("$stop"):
