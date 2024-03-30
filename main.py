@@ -34,13 +34,10 @@ class ChatBotClient(Client):
         }
 
     async def query_model(self, message: Message):
-        """Query the LLM Model with the provided prompt.
+        """Query the LLM Model with the provided prompt and reply
 
         Args:
             message (discord.Message): The Discord message to respond to.
-
-        Returns:
-            str: The model's response stripped of any metadata.
         """
 
         prompt = await self.message_to_context(message)
