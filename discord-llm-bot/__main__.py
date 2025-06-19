@@ -12,6 +12,7 @@ def main():
     cloudflare_worker = CloudFlareWorker(
         token=os.environ["CLOUDFLARE_TOKEN"], **CONFIG["cloudflare"]
     )
+    cloudflare_worker.check_api_access()
 
     chatbot_client = ChatBotClient(cloudflare_worker=cloudflare_worker)
     chatbot_client.run(os.getenv("DISCORD_TOKEN"), log_handler=None)
