@@ -1,0 +1,12 @@
+[project]
+name = "discord-llm-bot"
+version = "0.1.0"
+description = "A simple Discord chat bot that listens for messages and passes them through an LLM model hosted on Cloudflare Workers."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "discord-py>=2.5.2",
+    "pyyaml>=6.0.2",
+    "requests>=2.32.4",
+    "ruff>=0.12.0",
+]
