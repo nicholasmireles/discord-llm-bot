@@ -10,16 +10,6 @@ A modern Discord chat bot that uses Pydantic AI for structured, type-safe AI int
 - **Conversation Context**: Maintains conversation history and context
 - **Flexible Configuration**: Easy configuration through YAML files and environment variables
 
-## Migration from Original Bot
-
-This project has been migrated to use Pydantic AI, providing:
-
-1. **Better Type Safety**: All AI interactions are now type-safe with Pydantic models
-2. **Structured Responses**: AI responses are validated and structured using Pydantic
-3. **Multiple AI Providers**: Easy switching between different AI services
-4. **Improved Error Handling**: Better error handling and validation
-5. **Modern Architecture**: Clean separation of concerns with service-based architecture
-
 ## Installation
 
 1. Clone the repository
@@ -91,14 +81,6 @@ The bot uses Pydantic AI for all AI interactions:
 
 - **CloudflareAIService**: Cloudflare with Pydantic AI validation
 - **OpenAIAIService**: OpenAI with Pydantic AI structured responses
-
-## Benefits of Pydantic AI Migration
-
-1. **Type Safety**: All AI interactions are validated with Pydantic models
-2. **Structured Responses**: AI responses are guaranteed to match expected structure
-3. **Better Error Handling**: Validation errors are caught and handled gracefully
-4. **Developer Experience**: Better IDE support and autocomplete
-5. **Maintainability**: Cleaner, more maintainable code structure
 
 ## Development
 
