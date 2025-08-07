@@ -16,6 +16,44 @@ class AIService(ABC):
     async def generate_response(self, context: ConversationContext, current_message: BotMessage) -> AIResponse:
         """Generate a response using the AI service."""
         pass
+    
+    def format_conversation_messages(
+        self, 
+        context: ConversationContext, 
+        current_message: BotMessage, 
+        system_prompt: str
+    ) -> List[dict]:
+        """
+        Format conversation history into a list of messages for AI services.
+        
+        Args:
+            context: The conversation context containing message history
+            current_message: The current message to respond to
+            system_prompt: The system prompt/context to include
+            
+        Returns:
+            List[dict]: List of formatted messages for AI service consumption
+        """
+        # Start with system message
+        messages = [
+            {"role": "system", "content": system_prompt}
+        ]
+        
+        # Add conversation history
+        for msg in context.messages:
+            role = "assistant" if msg.is_bot else "user"
+            messages.append({
+                "role": role,
+                "content": f"{msg.author_name}: {msg.content}"
+            })
+        
+        # Add current message
+        messages.append({
+            "role": "user",
+            "content": f"{current_message.author_name}: {current_message.content}"
+        })
+        
+        return messages
 
 
 class CloudflareAIService(AIService):
@@ -48,24 +86,8 @@ class CloudflareAIService(AIService):
         Returns:
             AIResponse: The generated response
         """
-        # Format conversation history
-        messages = [
-            {"role": "system", "content": self.config.context}
-        ]
-        
-        # Add conversation history
-        for msg in context.messages:
-            role = "assistant" if msg.is_bot else "user"
-            messages.append({
-                "role": role,
-                "content": f"{msg.author_name}: {msg.content}"
-            })
-        
-        # Add current message
-        messages.append({
-            "role": "user",
-            "content": f"{current_message.author_name}: {current_message.content}"
-        })
+        # Format conversation history using common utility
+        messages = self.format_conversation_messages(context, current_message, self.config.context)
         
         # Make request to Cloudflare
         request_data = {
@@ -127,22 +149,8 @@ class OpenAIAIService(AIService):
             AIResponse: The generated response
         """
         try:
-            # Format conversation history
-            messages = []
-            
-            # Add conversation history
-            for msg in context.messages:
-                role = "assistant" if msg.is_bot else "user"
-                messages.append({
-                    "role": role,
-                    "content": f"{msg.author_name}: {msg.content}"
-                })
-            
-            # Add current message
-            messages.append({
-                "role": "user",
-                "content": f"{current_message.author_name}: {current_message.content}"
-            })
+            # Format conversation history using common utility
+            messages = self.format_conversation_messages(context, current_message, self.config.system_prompt)
             
             # Generate response using Pydantic AI agent
             result = await self.agent.run(messages=messages)
