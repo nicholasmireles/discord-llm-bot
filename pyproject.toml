@@ -1,12 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "discord-llm-bot"
 version = "0.1.0"
 description = "A simple Discord chat bot that listens for messages and passes them through an LLM model hosted on Cloudflare Workers."
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
     "discord-py>=2.5.2",
     "pyyaml>=6.0.2",
     "requests>=2.32.4",
     "ruff>=0.12.0",
+    "pydantic-ai>=0.0.1",
+    "pydantic>=2.0.0",
+    "openai>=1.0.0",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "black>=23.0.0",
+    "ruff>=0.12.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["discord_llm_bot"]

@@ -35,6 +35,7 @@ class CloudFlareWorker:
 
         Args:
             message (discord.Message): The Discord message to respond to.
+            transcript (List[str]): The transcript for the current conversation.
         """
 
         request = {
