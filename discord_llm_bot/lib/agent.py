@@ -1,5 +1,5 @@
 import logging
-from pydantic_ai.messages import ModelMessage, ModelResponse
+from pydantic_ai.messages import ModelMessage, ModelResponse, TextPart
 from pydantic_ai.models import Model
 import requests
 from typing import List, AsyncIterator
@@ -26,8 +26,16 @@ class CloudflareModel(Model):
         # Convert ModelMessage objects to the format expected by Cloudflare API
         cf_messages = []
         for msg in messages:
-            if hasattr(msg, "role") and hasattr(msg, "content"):
-                cf_messages.append({"role": msg.role, "content": msg.content})
+            cf_messages.extend(
+                [
+                    {
+                        "role": "user" if msg.kind == "request" else "system",
+                        "content": part.content,
+                    }
+                    for part in msg.parts
+                    if isinstance(part, TextPart)
+                ]
+            )
 
         request_data = {
             "url": self.config.api_url + self.config.model,
@@ -35,23 +43,14 @@ class CloudflareModel(Model):
             "json": {"messages": cf_messages},
         }
 
-        try:
-            response = requests.post(**request_data, timeout=30)
-            response.raise_for_status()
+        response = requests.post(**request_data, timeout=30)
+        response.raise_for_status()
 
-            result = response.json()
-            response_content = result.get("result", {}).get("response", "")
+        result = response.json()
+        response_content = result.get("result", {}).get("response", "")
 
-            # Return a ModelResponse object
-            return ModelResponse(model_name=self.config.model, content=response_content)
-
-        except Exception as e:
-            logger.error(f"Error calling Cloudflare AI: {e}")
-            # Return error response
-            return ModelResponse(
-                model_name=self.config.model,
-                content="I'm sorry, I'm having a hard time thinking right now. :pensive:",
-            )
+        # Return a ModelResponse object
+        return ModelResponse(model_name=self.config.model, content=response_content)
 
     async def stream(self, messages: List[ModelMessage]) -> AsyncIterator[str]:
         """Stream response from Cloudflare AI (not implemented for Cloudflare)."""
