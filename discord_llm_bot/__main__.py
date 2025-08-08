@@ -6,7 +6,7 @@ from .lib.utils import check_cloudflare_api_access
 from .config import CONFIG
 
 # Set up logging
-logging.basicConfig(level=getattr(logging, CONFIG.agent.logging_level))
+logging.basicConfig(level=getattr(logging, CONFIG.logging_level))
 
 
 def main():
