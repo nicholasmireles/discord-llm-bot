@@ -18,16 +18,16 @@ class AgentConfig(BaseModel):
     api_url: Optional[str] = Field(None, description="API URL")
     model: str = Field(default="gpt-3.5-turbo", description="Model to use")
     system_prompt: str = Field(default="", description="System prompt for the AI model")
-    env: str = Field(default="dev", description="Environment name")
-    ai_provider: str = Field(
+    provider: str = Field(
         default="cloudflare", description="AI provider to use (cloudflare or openai)"
     )
-    logging_level: str = Field(default="INFO", description="Logging level")
 
 
 class Config(BaseModel):
     """Main bot configuration."""
 
+    env: str = Field(default="dev", description="Environment name")
+    logging_level: str = Field(default="INFO", description="Logging level")
     discord: DiscordConfig = Field(..., description="Discord configuration")
     agent: AgentConfig = Field(..., description="Agent configuration")
 

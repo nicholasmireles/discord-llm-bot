@@ -23,8 +23,7 @@ A modern Discord chat bot that uses Pydantic AI for structured, type-safe AI int
 ### Environment Variables
 
 - `DISCORD_TOKEN`: Your Discord bot token
-- `CLOUDFLARE_TOKEN`: Your Cloudflare API token (if using Cloudflare)
-- `OPENAI_API_KEY`: Your OpenAI API key (if using OpenAI)
+- `AGENT_API_KEY`: Your Cloudflare API or OpenAI API key
 - `ENV`: Environment name (default: "dev")
 
 ### Configuration Files
@@ -32,24 +31,20 @@ A modern Discord chat bot that uses Pydantic AI for structured, type-safe AI int
 The bot uses YAML configuration files in the `config/` directory:
 
 - `config/default.yaml`: Default configuration
-- `config/dev.yaml`: Development environment configuration
+- `config/{$ENV}.yaml`: Environment-specific configurations
 
 Example configuration:
 ```yaml
 env: dev
+logging_level: "INFO"
 discord:
   token: ""  # Loaded from environment variable
-cloudflare:
+agent:
   api_url: "https://api.cloudflare.com/client/v4/accounts/.../ai/run/"
-  model: "@cf/meta/llama-2-7b-chat-fp16"
-  context: "You are NickBot, a friendly Discord bot assistant..."
-  token: ""  # Loaded from environment variable
-openai:
   api_key: ""  # Loaded from environment variable
-  model: "gpt-3.5-turbo"
+  model: "@cf/meta/llama-2-7b-chat-fp16"
   system_prompt: "You are NickBot, a friendly Discord bot assistant..."
-ai_provider: "cloudflare"  # Options: "cloudflare" or "openai"
-logging_level: "INFO"
+  provider: "cloudflare"  # Options: "cloudflare" or "openai"
 ```
 
 ## Usage
@@ -60,18 +55,18 @@ logging_level: "INFO"
 uv run python -m discord_llm_bot
 ```
 
-### Bot Commands
+### Conversation Flow
 
 - **Mention the bot**: Start a conversation by mentioning the bot
 - **Continue chatting**: The bot will continue responding in the same channel
-- **$stop**: Stop the conversation and clear context
+- **End the conversation**: The bot has the ability to end the conversation each time it replies.
 
 ## Architecture
 
 ### Core Components
 
 1. **Models** (`models.py`): Pydantic models for type safety
-2. **AI Services** (`lib/pydantic_ai_service.py`): Pydantic AI service implementations
+2. **Agent** (`lib/agent.py`): Pydantic AI Agent generation and custom model definitions
 3. **Client** (`client.py`): Discord bot client with conversation management
 4. **Configuration** (`config.py`): Configuration loading and validation
 
