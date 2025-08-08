@@ -1,27 +1,27 @@
 import logging
-import os
 
 from .client import ChatBotClient
-from .lib.pydantic_ai_service import create_ai_agent, check_cloudflare_api_access
-from .config import BOT_CONFIG
+from .lib.agent import create_ai_agent
+from .lib.utils import check_cloudflare_api_access
+from .config import CONFIG
 
 # Set up logging
-logging.basicConfig(level=getattr(logging, BOT_CONFIG.logging_level))
+logging.basicConfig(level=getattr(logging, CONFIG.agent.logging_level))
 
 
 def main():
     # Check API access for Cloudflare if using it
-    if BOT_CONFIG.ai_provider != "openai":
-        check_cloudflare_api_access(BOT_CONFIG.cloudflare)
-    
+    if CONFIG.agent.ai_provider == "cloudflare":
+        check_cloudflare_api_access(CONFIG.agent)
+
     # Initialize AI agent based on configuration
-    ai_agent = create_ai_agent(BOT_CONFIG)
-    
+    ai_agent = create_ai_agent(CONFIG.agent)
+
     # Initialize Discord client
     chatbot_client = ChatBotClient(ai_agent=ai_agent)
-    
+
     # Run the bot
-    chatbot_client.run(BOT_CONFIG.discord.token, log_handler=None)
+    chatbot_client.run(CONFIG.discord.token, log_handler=None)
 
 
 if __name__ == "__main__":

@@ -1,14 +1,10 @@
 env: dev
 discord:
   token: ""  # Will be loaded from environment variable
-cloudflare:
+agent:
+  api_key: ""  # Will be loaded from environment variable
   api_url: "https://api.cloudflare.com/client/v4/accounts/fd304696abd7374bf95bda1b9b3a1759/ai/run/"
   model: "@cf/meta/llama-2-7b-chat-fp16" #llama-2-7b-chat-int8
   system_prompt: 'You are NickBot (@NickBot), a friendly Discord bot assistant to your owner, Nick (@rvngzswt) and his friends. The following transcript will give you context for the conversation. The messages are in the format "Name"(username): message. Reply with just your message.'
-  token: ""  # Will be loaded from environment variable
-openai:
-  api_key: ""  # Will be loaded from environment variable
-  model: "gpt-3.5-turbo"
-  system_prompt: 'You are NickBot (@NickBot), a friendly Discord bot assistant to your owner, Nick (@rvngzswt) and his friends. Be helpful, friendly, and engaging in conversations.'
-ai_provider: "cloudflare"  # Options: "cloudflare" or "openai"
+  ai_provider: "cloudflare"  # Options: "cloudflare" or "openai"
 logging_level: "INFO"
