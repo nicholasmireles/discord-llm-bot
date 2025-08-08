@@ -6,7 +6,7 @@ from typing import List, Optional, AsyncIterator, Union
 import json
 
 from pydantic_ai import agent
-from ..models import Message as BotMessage, AIResponse, CloudflareConfig, OpenAIConfig
+from ..models import Message as BotMessage, AIResponse, CloudflareConfig, OpenAIConfig, BotConfig
 
 logger = logging.getLogger(__name__)
 
@@ -85,20 +85,20 @@ def check_cloudflare_api_access(config: CloudflareConfig) -> None:
     response.raise_for_status()
 
 
-def create_cloudflare_agent(config: CloudflareConfig) -> agent.Agent:
-    """Create a Pydantic AI agent for Cloudflare AI."""
-    custom_model = CloudflareModel(config)
-    return agent.Agent(
-        model=custom_model,
-        system_prompt=config.context,
-        output_type=AIResponse
-    )
-
-
-def create_openai_agent(config: OpenAIConfig) -> agent.Agent:
-    """Create a Pydantic AI agent for OpenAI."""
-    return agent.Agent(
-        model=config.model,
-        system_prompt=config.system_prompt,
-        output_type=AIResponse
-    )
+def create_ai_agent(bot_config: BotConfig) -> agent.Agent:
+    """Create a Pydantic AI agent based on the bot configuration."""
+    if bot_config.ai_provider == "openai" and bot_config.openai:
+        # Create OpenAI agent
+        return agent.Agent(
+            model=bot_config.openai.model,
+            system_prompt=bot_config.openai.system_prompt,
+            output_type=AIResponse
+        )
+    else:
+        # Create Cloudflare agent (default)
+        custom_model = CloudflareModel(bot_config.cloudflare)
+        return agent.Agent(
+            model=custom_model,
+            system_prompt=bot_config.cloudflare.system_prompt,
+            output_type=AIResponse
+        )

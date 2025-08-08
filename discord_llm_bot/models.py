@@ -12,7 +12,7 @@ class CloudflareConfig(BaseModel):
     """Configuration for Cloudflare AI settings."""
     api_url: str = Field(..., description="Cloudflare AI API URL")
     model: str = Field(..., description="AI model to use")
-    context: str = Field(..., description="System context for the AI model")
+    system_prompt: str = Field(..., description="System prompt for the AI model")
     token: str = Field(..., description="Cloudflare API token")
 
 

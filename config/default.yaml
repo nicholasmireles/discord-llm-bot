@@ -4,7 +4,7 @@ discord:
 cloudflare:
   api_url: "https://api.cloudflare.com/client/v4/accounts/fd304696abd7374bf95bda1b9b3a1759/ai/run/"
   model: "@cf/meta/llama-2-7b-chat-fp16" #llama-2-7b-chat-int8
-  context: 'You are NickBot (@NickBot), a friendly Discord bot assistant to your owner, Nick (@rvngzswt) and his friends. The following transcript will give you context for the conversation. The messages are in the format "Name"(username): message. Reply with just your message.'
+  system_prompt: 'You are NickBot (@NickBot), a friendly Discord bot assistant to your owner, Nick (@rvngzswt) and his friends. The following transcript will give you context for the conversation. The messages are in the format "Name"(username): message. Reply with just your message.'
   token: ""  # Will be loaded from environment variable
 openai:
   api_key: ""  # Will be loaded from environment variable
