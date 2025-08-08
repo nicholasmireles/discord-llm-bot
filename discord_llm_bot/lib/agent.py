@@ -5,7 +5,7 @@ import requests
 from typing import List, AsyncIterator
 
 from pydantic_ai import agent
-from ..models import Message as AIResponse, AgentConfig
+from ..models import AIResponse, AgentConfig
 
 logger = logging.getLogger(__name__)
 

@@ -3,7 +3,7 @@ import re
 from discord import Client, Intents, Message
 
 from pydantic_ai import agent
-from .models import Message as AIResponse
+from .models import AIResponse
 
 logger = logging.getLogger(__name__)
 
