@@ -64,7 +64,7 @@ class CloudflareModel(Model):
 
 
 def create_ai_agent(agent_config: AgentConfig) -> agent.Agent:
-    """Create a Pydantic AI agent based on the bot configuration."""
+    """Create a Pydantic AI agent based on the provided configuration."""
     if agent_config.ai_provider == "cloudflare":
         model = CloudflareModel(agent_config)
     else:
