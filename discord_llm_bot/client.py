@@ -82,15 +82,9 @@ class ChatBotClient(Client):
                     # Message in listening channel
                     bot_message = self.add_message_to_context(discord_message)
                     
-                    if discord_message.content.startswith("$stop"):
-                        await self.listening_channel.send("Shutting up :zipper_mouth:")
-                        self.listening_channel = None
-                        self.conversation_context.clear()
-                        return
-                    else:
-                        response = await self.ai_service.generate_response(
-                            self.conversation_context, bot_message
-                        )
+                    response = await self.ai_service.generate_response(
+                        self.conversation_context, bot_message
+                    )
                         
                 case _:
                     # Message not relevant to bot

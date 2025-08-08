@@ -60,4 +60,4 @@ class ConversationContext(BaseModel):
 class AIResponse(BaseModel):
     """Represents an AI-generated response."""
     content: str = Field(..., description="The response content")
-    should_stop_listening: bool = Field(default=False, description="Whether to stop listening in the channel")
+    should_stop_listening: bool = Field(default=False, description="Whether to end the conversation and stop listening in the channel")

@@ -134,7 +134,8 @@ class OpenAIAIService(AIService):
         # Create a Pydantic AI agent for OpenAI
         self.agent = agent.Agent(
             model=config.model,
-            system_prompt=config.system_prompt
+            system_prompt=config.system_prompt,
+            output_type=AIResponse
         )
 
     async def generate_response(self, context: ConversationContext, current_message: BotMessage) -> AIResponse:
@@ -154,17 +155,8 @@ class OpenAIAIService(AIService):
             
             # Generate response using Pydantic AI agent
             result = await self.agent.run(messages=messages)
-            
-            # Extract the response content
-            response_content = result.content if hasattr(result, 'content') else str(result)
-            
-            # Create AIResponse with validation
-            ai_response = AIResponse(
-                content=response_content,
-                should_stop_listening="$stop" in response_content.lower() or "stop listening" in response_content.lower()
-            )
-            
-            return ai_response
+
+            return result.output
             
         except Exception as e:
             logger.error(f"Error calling OpenAI with Pydantic AI: {e}")
