@@ -3,44 +3,20 @@ import re
 from typing import List
 from discord import Client, Intents, Message
 
+from pydantic_ai import agent
 from .models import ConversationContext, Message as BotMessage, AIResponse
-from .lib.pydantic_ai_service import AIService
 
 logger = logging.getLogger(__name__)
 
 
 class ChatBotClient(Client):
-    def __init__(self, ai_service: AIService, *args, **kwargs):
+    def __init__(self, ai_agent: agent.Agent, *args, **kwargs):
         self.listening_channel = None
-        self.ai_service = ai_service
-        self.conversation_context = ConversationContext()
-
+        self.ai_agent = ai_agent
+        self.message_history = []
         intents = Intents.default()
         intents.message_content = True
         super().__init__(*args, intents=intents, **kwargs)
-
-    def add_message_to_context(self, discord_message: Message) -> BotMessage:
-        """
-        Add a Discord message to the conversation context.
-        Args:
-            discord_message (discord.Message): The Discord message to add to the context.
-        Returns:
-            BotMessage: The converted bot message
-        """
-        # Clean the message content
-        cleaned_content = re.sub(r"<.*>", "", discord_message.content)
-        
-        # Create bot message
-        bot_message = BotMessage(
-            author_name=discord_message.author.global_name or discord_message.author.name,
-            author_username=discord_message.author.name,
-            content=cleaned_content,
-            channel_id=discord_message.channel.id,
-            is_bot=discord_message.author == self.user
-        )
-        
-        self.conversation_context.add_message(bot_message)
-        return bot_message
 
     async def on_ready(self) -> None:
         """
@@ -66,25 +42,16 @@ class ChatBotClient(Client):
                 case Message(mentions=[self.user]):
                     # Bot was mentioned - start listening
                     cleaned_content = re.sub(r"<@.*>", "@NickBot", discord_message.content)
-                    discord_message.content = cleaned_content
                     
                     self.listening_channel = discord_message.channel
-                    self.conversation_context.current_channel_id = discord_message.channel.id
                     
-                    bot_message = self.add_message_to_context(discord_message)
-                    response = await self.ai_service.generate_response(
-                        self.conversation_context, bot_message
-                    )
+                    response = await self._generate_response(cleaned_content)
                     
                 case Message(channel=self.listening_channel) if (
                     self.listening_channel is not None
                 ):
                     # Message in listening channel
-                    bot_message = self.add_message_to_context(discord_message)
-                    
-                    response = await self.ai_service.generate_response(
-                        self.conversation_context, bot_message
-                    )
+                    response = await self._generate_response(discord_message.content)
                         
                 case _:
                     # Message not relevant to bot
@@ -100,4 +67,27 @@ class ChatBotClient(Client):
             # If AI wants to stop listening, clear the context
             if response.should_stop_listening:
                 self.listening_channel = None
-                self.conversation_context.clear()
+
+    async def _generate_response(self, user_content: str) -> AIResponse:
+        """Generate a response using the AI agent."""
+        try:
+            # Generate response using Pydantic AI agent
+            result: agent.AgentRunResult = await self.ai_agent.run(
+                user_prompt=user_content,
+                message_history=self.message_history
+            )
+
+            # Check if we should stop listening and clear history
+            if result.output.should_stop_listening:
+                self.message_history.clear()
+            else:
+                self.message_history.extend(result.new_messages())
+
+            return result.output
+            
+        except Exception as e:
+            logger.error(f"Error calling AI agent: {e}")
+            return AIResponse(
+                content="I'm sorry, I'm having a hard time thinking right now. :pensive:",
+                should_stop_listening=False
+            )

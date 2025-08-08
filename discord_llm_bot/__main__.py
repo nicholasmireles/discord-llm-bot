@@ -2,7 +2,7 @@ import logging
 import os
 
 from .client import ChatBotClient
-from .lib.pydantic_ai_service import CloudflareAIService, OpenAIAIService
+from .lib.pydantic_ai_service import create_cloudflare_agent, create_openai_agent, check_cloudflare_api_access
 from .config import BOT_CONFIG
 
 # Set up logging
@@ -10,17 +10,17 @@ logging.basicConfig(level=getattr(logging, BOT_CONFIG.logging_level))
 
 
 def main():
-    # Initialize AI service based on configuration
+    # Initialize AI agent based on configuration
     if BOT_CONFIG.ai_provider == "openai" and BOT_CONFIG.openai:
-        ai_service = OpenAIAIService(config=BOT_CONFIG.openai)
+        ai_agent = create_openai_agent(config=BOT_CONFIG.openai)
     else:
         # Default to Cloudflare
-        ai_service = CloudflareAIService(config=BOT_CONFIG.cloudflare)
         # Check API access for Cloudflare
-        ai_service.check_api_access()
+        check_cloudflare_api_access(BOT_CONFIG.cloudflare)
+        ai_agent = create_cloudflare_agent(config=BOT_CONFIG.cloudflare)
     
     # Initialize Discord client
-    chatbot_client = ChatBotClient(ai_service=ai_service)
+    chatbot_client = ChatBotClient(ai_agent=ai_agent)
     
     # Run the bot
     chatbot_client.run(BOT_CONFIG.discord.token, log_handler=None)
